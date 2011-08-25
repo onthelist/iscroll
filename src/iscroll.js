@@ -439,11 +439,16 @@ iScroll.prototype = {
 		if (that.options.onScrollMove) that.options.onScrollMove.call(that, e);
 	},
 	
-	_end: function (e) {
-		if (hasTouch && e.touches.length != 0) return;
+	_end: function (e, _hasTouch) {
+	  // hasTouch may be overrode so we can fake _ends w/o requiring the
+	  // touch properties in e.
+	  if (_hasTouch == undefined)
+	    _hasTouch = hasTouch;
+
+		if (_hasTouch && e.touches.length != 0) return;
 
 		var that = this,
-			point = hasTouch ? e.changedTouches[0] : e,
+			point = _hasTouch ? e.changedTouches[0] : e,
 			target, ev,
 			momentumX = { dist:0, time:0 },
 			momentumY = { dist:0, time:0 },
@@ -481,7 +486,7 @@ iScroll.prototype = {
 		}
 
 		if (!that.moved) {
-			if (hasTouch) {
+			if (_hasTouch) {
 				if (that.doubleTapTimer && that.options.zoom) {
 					// Double tapped
 					clearTimeout(that.doubleTapTimer);
